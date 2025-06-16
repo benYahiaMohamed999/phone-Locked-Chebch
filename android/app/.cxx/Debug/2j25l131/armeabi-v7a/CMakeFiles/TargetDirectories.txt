@@ -1,0 +1,2 @@
+/Users/mahdi.BT/Documents/phone_store_mangment/android/app/.cxx/Debug/2j25l131/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/mahdi.BT/Documents/phone_store_mangment/android/app/.cxx/Debug/2j25l131/armeabi-v7a/CMakeFiles/rebuild_cache.dir
