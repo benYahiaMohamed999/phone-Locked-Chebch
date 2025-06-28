@@ -1,8 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../providers/auth_provider.dart' as auth_provider;
 
 class LoginScreen extends StatefulWidget {
@@ -14,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(text: 'admin@example.com');
+  final _passwordController = TextEditingController(text: 'admin123');
   bool _isLoading = false;
   bool _obscurePassword = true;
 
@@ -136,7 +137,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: theme.colorScheme.primary,
                               ),
                               filled: true,
-                              fillColor: theme.colorScheme.surfaceVariant
+                              fillColor: theme
+                                  .colorScheme.surfaceContainerHighest
                                   .withOpacity(0.3),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -191,7 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                               ),
                               filled: true,
-                              fillColor: theme.colorScheme.surfaceVariant
+                              fillColor: theme
+                                  .colorScheme.surfaceContainerHighest
                                   .withOpacity(0.3),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),

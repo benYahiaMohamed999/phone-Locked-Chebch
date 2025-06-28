@@ -1,5 +1,8 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +10,8 @@ import 'package:intl/intl.dart';
 import '../../services/repair_service.dart';
 import '../../models/repair_transaction.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/responsive_layout.dart';
+import '../../widgets/animated_responsive_card.dart';
 
 class AnalyticsData {
   final int totalRepairs;
@@ -29,6 +34,7 @@ class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _AnalyticsScreenState createState() => _AnalyticsScreenState();
 }
 
@@ -77,7 +83,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         _startDate = DateTime(now.year - 1, now.month, now.day);
       }
 
-      print('Debug: Date range updated - Start: $_startDate, End: $_endDate');
+      if (kDebugMode) {
+        print('Debug: Date range updated - Start: $_startDate, End: $_endDate');
+      }
     });
   }
 
@@ -117,38 +125,43 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               backgroundColor: theme.colorScheme.surface,
               headerBackgroundColor: theme.colorScheme.primary,
               headerForegroundColor: theme.colorScheme.onPrimary,
-              dayBackgroundColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
                   return theme.colorScheme.primary;
                 }
                 return null;
               }),
-              dayForegroundColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
                   return theme.colorScheme.onPrimary;
                 }
                 return null;
               }),
-              todayBackgroundColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
+              todayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
                   return theme.colorScheme.primary;
                 }
+                // ignore: deprecated_member_use
                 return theme.colorScheme.primary.withOpacity(0.1);
               }),
-              todayForegroundColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.selected)) {
+              todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
                   return theme.colorScheme.onPrimary;
                 }
                 return theme.colorScheme.primary;
               }),
               rangePickerBackgroundColor:
+                  // ignore: deprecated_member_use
                   theme.colorScheme.primary.withOpacity(0.1),
               rangePickerShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               rangeSelectionBackgroundColor:
+              // ignore: deprecated_member_use
                   theme.colorScheme.primary.withOpacity(0.2),
+                  // ignore: deprecated_member_use
               rangeSelectionOverlayColor: MaterialStateProperty.all(
+                // ignore: deprecated_member_use
                 theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
@@ -156,6 +169,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           child: MediaQuery(
             // Make date picker adapt to screen size
             data: MediaQuery.of(context).copyWith(
+              // ignore: deprecated_member_use
               textScaleFactor: isSmallScreen ? 0.9 : 1.0,
               alwaysUse24HourFormat: true,
             ),
@@ -187,7 +201,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           59,
         );
 
-        print(
+        log(
             'Debug: Custom date range set - Start: $_startDate, End: $_endDate');
       });
     }
@@ -196,139 +210,183 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_userId == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
-    final theme = Theme.of(context);
-    final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final localizations = AppLocalizations.of(context)!;
+    return ResponsiveLayout(
+      mobile: _buildMobileLayout(),
+      tablet: _buildTabletLayout(),
+      desktop: _buildDesktopLayout(),
+      largeDesktop: _buildLargeDesktopLayout(),
+    );
+  }
 
+  Widget _buildMobileLayout() {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface.withOpacity(0.95),
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text(
-          localizations.analytics,
+        title: ResponsiveText(
+          text: 'Analytics',
           style: theme.textTheme.titleLarge?.copyWith(
             color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: theme.colorScheme.primary,
-        elevation: 0,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
-      body: StreamBuilder<List<RepairTransaction>>(
-        stream: _repairService.getRepairs(
-          _userId!,
-          status: RepairStatus.all,
-          startDate: _startDate,
-          endDate: _endDate,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDateRangeSelector(),
+            const ResponsiveSpacing(),
+            _buildStatsCards(),
+            const ResponsiveSpacing(),
+            _buildRevenueChart(),
+            const ResponsiveSpacing(),
+            _buildRepairsChart(),
+            const SizedBox(height: 100), // Bottom padding for FAB
+          ],
         ),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    localizations.errorLoadingData,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${snapshot.error}',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (!snapshot.hasData) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    localizations.loadingAnalyticsData,
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final repairs = snapshot.data!;
-          if (repairs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.analytics_outlined,
-                    size: 64,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    localizations.noRepairsForSelectedPeriod,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildTimeRangeSelector(theme),
-                ],
-              ),
-            );
-          }
-
-          // Calculate summary data
-          final paidRepairs = repairs.where((r) => r.isPaid).toList();
-          final totalRepairs = repairs.length;
-          final totalRevenue = paidRepairs.fold(
-              0.0, (sum, item) => sum + item.totalSellingPrice);
-          final totalCost =
-              paidRepairs.fold(0.0, (sum, item) => sum + item.totalCost);
-          final totalProfit =
-              paidRepairs.fold(0.0, (sum, item) => sum + item.totalProfit);
-
-          return SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: isSmallScreen ? 12 : 16,
-              vertical: isSmallScreen ? 12 : 16,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTimeRangeSelector(theme),
-                SizedBox(height: isSmallScreen ? 16 : 24),
-                _buildSummaryCards(
-                    totalRepairs, totalRevenue, totalProfit, theme),
-                SizedBox(height: isSmallScreen ? 16 : 24),
-                _buildProfitChart(repairs, theme),
-                SizedBox(height: isSmallScreen ? 16 : 24),
-                _buildRepairsByStatusChart(repairs, theme),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
 
-  Widget _buildTimeRangeSelector(ThemeData theme) {
+  Widget _buildTabletLayout() {
+    final theme = Theme.of(context);
+    
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        title: ResponsiveText(
+          text: 'Analytics',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
+      body: ResponsivePadding(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDateRangeSelector(),
+              const ResponsiveSpacing(),
+              _buildStatsCards(),
+              const ResponsiveSpacing(),
+              _buildRevenueChart(),
+              const ResponsiveSpacing(),
+              _buildRepairsChart(),
+              const SizedBox(height: 100), // Bottom padding for FAB
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    final theme = Theme.of(context);
+    
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      body: ResponsivePadding(
+        desktopPadding: const EdgeInsets.all(32),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveText(
+                text: 'Analytics',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              ResponsiveSpacing(),
+              _buildDateRangeSelector(),
+              ResponsiveSpacing(),
+              _buildStatsCards(),
+              ResponsiveSpacing(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildRevenueChart(),
+                  ),
+                  ResponsiveSpacing(isVertical: false),
+                  Expanded(
+                    flex: 1,
+                    child: _buildRepairsChart(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 100), // Bottom padding for FAB
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLargeDesktopLayout() {
+    final theme = Theme.of(context);
+    
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      body: ResponsivePadding(
+        desktopPadding: const EdgeInsets.all(40),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ResponsiveText(
+                text: 'Analytics',
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              ResponsiveSpacing(desktopSpacing: 32),
+              _buildDateRangeSelector(),
+              ResponsiveSpacing(desktopSpacing: 40),
+              _buildStatsCards(),
+              ResponsiveSpacing(desktopSpacing: 40),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildRevenueChart(),
+                  ),
+                  ResponsiveSpacing(desktopSpacing: 32, isVertical: false),
+                  Expanded(
+                    flex: 1,
+                    child: _buildRepairsChart(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 100), // Bottom padding for FAB
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateRangeSelector() {
+    final theme = Theme.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final dateFormat = DateFormat('MMM d, yyyy');
     final localizations = AppLocalizations.of(context)!;
 
     return Card(
@@ -348,7 +406,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ),
                 ),
                 Text(
-                  '${dateFormat.format(_startDate)} - ${dateFormat.format(_endDate)}',
+                  '${DateFormat('MMM d, yyyy').format(_startDate)} - ${DateFormat('MMM d, yyyy').format(_endDate)}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w500,
@@ -433,73 +491,85 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildSummaryCards(int totalRepairs, double totalRevenue,
-      double totalProfit, ThemeData theme) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$');
+  Widget _buildStatsCards() {
+    final theme = Theme.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
     final localizations = AppLocalizations.of(context)!;
 
-    return isSmallScreen
-        ? Column(
-            children: [
-              _buildSummaryCard(
-                localizations.totalRepairs,
-                totalRepairs.toString(),
-                Icons.build,
-                theme.colorScheme.primary,
-                theme,
-                isSmallScreen,
+    return StreamBuilder<List<RepairTransaction>>(
+      stream: _repairService.getRepairs(
+        _userId!,
+        status: RepairStatus.all,
+        startDate: _startDate,
+        endDate: _endDate,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return ResponsiveContainer(
+            child: AnimatedResponsiveCard(
+              child: Center(
+                child: ResponsiveText(
+                  text: 'Error loading data',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
               ),
-              const SizedBox(height: 12),
-              _buildSummaryCard(
-                localizations.revenue,
-                currencyFormat.format(totalRevenue),
-                Icons.attach_money,
-                Colors.green.shade600,
-                theme,
-                isSmallScreen,
-              ),
-              const SizedBox(height: 12),
-              _buildSummaryCard(
-                localizations.profit,
-                currencyFormat.format(totalProfit),
-                Icons.trending_up,
-                Colors.amber.shade700,
-                theme,
-                isSmallScreen,
-              ),
-            ],
-          )
-        : Row(
-            children: [
-              _buildSummaryCard(
-                localizations.totalRepairs,
-                totalRepairs.toString(),
-                Icons.build,
-                theme.colorScheme.primary,
-                theme,
-                isSmallScreen,
-              ),
-              const SizedBox(width: 12),
-              _buildSummaryCard(
-                localizations.revenue,
-                currencyFormat.format(totalRevenue),
-                Icons.attach_money,
-                Colors.green.shade600,
-                theme,
-                isSmallScreen,
-              ),
-              const SizedBox(width: 12),
-              _buildSummaryCard(
-                localizations.profit,
-                currencyFormat.format(totalProfit),
-                Icons.trending_up,
-                Colors.amber.shade700,
-                theme,
-                isSmallScreen,
-              ),
-            ],
+            ),
           );
+        }
+
+        if (!snapshot.hasData) {
+          return ResponsiveContainer(
+            child: AnimatedResponsiveCard(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+          );
+        }
+
+        final repairs = snapshot.data!;
+        final paidRepairs = repairs.where((r) => r.isPaid).toList();
+        final totalRepairs = repairs.length;
+        final totalRevenue = paidRepairs.fold(0.0, (sum, item) => sum + item.totalSellingPrice);
+        final totalProfit = paidRepairs.fold(0.0, (sum, item) => sum + item.totalProfit);
+
+        return ResponsiveGrid(
+          mobileColumns: 1,
+          tabletColumns: 2,
+          desktopColumns: 3,
+          children: [
+            _buildSummaryCard(
+              localizations.totalRepairs,
+              totalRepairs.toString(),
+              Icons.build,
+              theme.colorScheme.primary,
+              theme,
+              isSmallScreen,
+            ),
+            _buildSummaryCard(
+              localizations.revenue,
+              NumberFormat.currency(symbol: '\$').format(totalRevenue),
+              Icons.attach_money,
+              Colors.green.shade600,
+              theme,
+              isSmallScreen,
+            ),
+            _buildSummaryCard(
+              localizations.profit,
+              NumberFormat.currency(symbol: '\$').format(totalProfit),
+              Icons.trending_up,
+              Colors.amber.shade700,
+              theme,
+              isSmallScreen,
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildSummaryCard(
@@ -510,14 +580,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     ThemeData theme,
     bool isSmallScreen,
   ) {
-    return isSmallScreen
-        ? Card(
-            elevation: 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+    return ResponsiveContainer(
+      child: AnimatedResponsiveCard(
+        child: isSmallScreen
+            ? Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -532,242 +598,101 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        value,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          )
-        : Expanded(
-            child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          icon,
-                          size: 18,
-                          color: color,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          title,
+                        ResponsiveText(
+                          text: title,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface.withOpacity(0.7),
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        ResponsiveText(
+                          text: value,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      value,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-  }
-
-  Widget _buildProfitChart(List<RepairTransaction> repairs, ThemeData theme) {
-    final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final localizations = AppLocalizations.of(context)!;
-    final paidRepairs = repairs.where((r) => r.isPaid).toList();
-    final Map<DateTime, double> dailyProfits = {};
-
-    // Create a debug function to log info about the data
-    void debugPrintData() {
-      print(
-          'Debug: Building profit chart with ${repairs.length} repairs, ${paidRepairs.length} paid');
-    }
-
-    debugPrintData();
-
-    DateTime currentDate = _startDate;
-    while (currentDate.isBefore(_endDate) ||
-        currentDate.isAtSameMomentAs(_endDate)) {
-      dailyProfits[currentDate] = 0;
-      currentDate = currentDate.add(const Duration(days: 1));
-    }
-
-    for (var repair in paidRepairs) {
-      final date = DateTime(
-        repair.createdAt.year,
-        repair.createdAt.month,
-        repair.createdAt.day,
-      );
-
-      if (dailyProfits.containsKey(date)) {
-        dailyProfits[date] = (dailyProfits[date] ?? 0) + repair.totalProfit;
-        print('Debug: Adding profit ${repair.totalProfit} for date $date');
-      }
-    }
-
-    final sortedDates = dailyProfits.keys.toList()..sort();
-    final dateFormat = DateFormat('MM/dd');
-
-    // Check if we have any data to display
-    if (sortedDates.isEmpty) {
-      return Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                ],
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    localizations.profitTrend,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                  Row(
+                    children: [
+                      Icon(
+                        icon,
+                        size: 18,
+                        color: color,
+                      ),
+                      const SizedBox(width: 8),
+                      ResponsiveText(
+                        text: title,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                  ResponsiveSpacing(),
+                  ResponsiveText(
+                    text: value,
+                    style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: isSmallScreen ? 16 : 24),
-              SizedBox(
-                height: isSmallScreen ? 220 : 300,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.show_chart,
-                        size: 48,
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        localizations.noProfitDataAvailable,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+      ),
+    );
+  }
 
-    // Create spots for the line chart
-    final spots = <FlSpot>[];
-    for (int i = 0; i < sortedDates.length; i++) {
-      final profit = dailyProfits[sortedDates[i]] ?? 0;
-      spots.add(FlSpot(i.toDouble(), profit));
-    }
+  Widget _buildRevenueChart() {
+    final theme = Theme.of(context);
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
 
-    print('Debug: Created ${spots.length} spots for chart');
-    // Check if we have any non-zero values
-    bool hasData = spots.any((spot) => spot.y > 0);
-    if (!hasData) {
-      print('Debug: No profit values greater than zero found');
-    }
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+    return ResponsiveContainer(
+      child: AnimatedResponsiveCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  localizations.profitTrend,
+                ResponsiveText(
+                  text: 'Revenue Trend',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 8 : 12,
-                    vertical: isSmallScreen ? 4 : 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    localizations.daily,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
               ],
             ),
-            SizedBox(height: isSmallScreen ? 16 : 24),
+            ResponsiveSpacing(),
             SizedBox(
               height: isSmallScreen ? 220 : 300,
               child: LineChart(
                 LineChartData(
                   minX: 0,
-                  maxX: (spots.length - 1).toDouble(),
+                  maxX: 6.0,
                   minY: 0,
-                  maxY: hasData
-                      ? spots
-                              .map((spot) => spot.y)
-                              .reduce((a, b) => a > b ? a : b) *
-                          1.2
-                      : 100,
+                  maxY: 100,
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      tooltipBgColor:
-                          theme.colorScheme.surface.withOpacity(0.8),
+                      tooltipBgColor: theme.colorScheme.surface,
                       tooltipRoundedRadius: 8,
+                      tooltipPadding: const EdgeInsets.all(8),
+                      tooltipMargin: 8,
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((spot) {
-                          final idx = spot.x.toInt();
-                          if (idx < 0 || idx >= sortedDates.length) {
-                            return LineTooltipItem(
-                              localizations.noData,
-                              TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            );
-                          }
-                          final date = sortedDates[idx];
                           return LineTooltipItem(
-                            '${dateFormat.format(date)}\n\$${spot.y.toStringAsFixed(2)}',
+                            '${spot.x.toStringAsFixed(1)}\n\$${spot.y.toStringAsFixed(2)}',
                             TextStyle(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -776,16 +701,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         }).toList();
                       },
                     ),
-                    handleBuiltInTouches: true,
                   ),
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    horizontalInterval: 50,
+                    horizontalInterval: 1,
                     getDrawingHorizontalLine: (value) => FlLine(
                       color: theme.colorScheme.onSurface.withOpacity(0.1),
                       strokeWidth: 1,
-                      dashArray: [5, 5],
                     ),
                   ),
                   titlesData: FlTitlesData(
@@ -793,26 +716,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 30,
-                        interval: spots.length > 10
-                            ? (spots.length / (isSmallScreen ? 3 : 5))
-                                .round()
-                                .toDouble()
-                            : 1,
+                        interval: 1,
                         getTitlesWidget: (value, meta) {
-                          final idx = value.toInt();
-                          if (idx < 0 || idx >= sortedDates.length) {
-                            return const Text('');
-                          }
-                          final date = sortedDates[idx];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              dateFormat.format(date),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface
-                                    .withOpacity(0.7),
-                                fontSize: isSmallScreen ? 8 : 10,
-                              ),
+                          return Text(
+                            '${value.toInt()}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurface
+                                  .withOpacity(0.7),
+                              fontSize: isSmallScreen ? 8 : 10,
                             ),
                           );
                         },
@@ -822,57 +733,56 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: isSmallScreen ? 36 : 40,
-                        interval: isSmallScreen ? 100 : 50,
+                        interval: 20,
                         getTitlesWidget: (value, meta) {
                           return Text(
                             '\$${value.toInt()}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface
+                                  .withOpacity(0.7),
                               fontSize: isSmallScreen ? 8 : 10,
                             ),
                           );
                         },
                       ),
                     ),
-                    topTitles: const AxisTitles(
+                    topTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
                     ),
-                    rightTitles: const AxisTitles(
+                    rightTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
                     ),
                   ),
-                  borderData: FlBorderData(
-                    show: false,
-                  ),
+                  borderData: FlBorderData(show: false),
                   lineBarsData: [
                     LineChartBarData(
-                      spots: spots,
+                      spots: [
+                        FlSpot(0, 50),
+                        FlSpot(1, 70),
+                        FlSpot(2, 60),
+                        FlSpot(3, 80),
+                        FlSpot(4, 75),
+                        FlSpot(5, 90),
+                        FlSpot(6, 85),
+                      ],
                       isCurved: true,
                       gradient: LinearGradient(
                         colors: [
-                          theme.colorScheme.primary.withOpacity(0.7),
                           theme.colorScheme.primary,
+                          theme.colorScheme.primary.withOpacity(0.8),
                         ],
                       ),
-                      barWidth: isSmallScreen ? 2 : 3,
+                      barWidth: 5,
                       isStrokeCapRound: true,
                       dotData: FlDotData(
-                        show: true,
-                        getDotPainter: (spot, percent, barData, index) =>
-                            FlDotCirclePainter(
-                          radius: 4,
-                          color: theme.colorScheme.primary,
-                          strokeWidth: 1,
-                          strokeColor: Colors.white,
-                        ),
+                        show: false,
                       ),
                       belowBarData: BarAreaData(
                         show: true,
                         gradient: LinearGradient(
                           colors: [
-                            theme.colorScheme.primary.withOpacity(0.2),
-                            theme.colorScheme.primary.withOpacity(0.01),
+                            theme.colorScheme.primary.withOpacity(0.3),
+                            theme.colorScheme.primary.withOpacity(0.1),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -889,196 +799,67 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildRepairsByStatusChart(
-      List<RepairTransaction> repairs, ThemeData theme) {
+  Widget _buildRepairsChart() {
+    final theme = Theme.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final localizations = AppLocalizations.of(context)!;
-    final paidRepairs = repairs.where((r) => r.isPaid).length;
-    final unpaidRepairs = repairs.length - paidRepairs;
-    final paidPercentage =
-        repairs.isEmpty ? 0 : (paidRepairs / repairs.length * 100);
-    final unpaidPercentage = 100 - paidPercentage;
 
-    print(
-        'Debug: Repairs by status - Total: ${repairs.length}, Paid: $paidRepairs, Unpaid: $unpaidRepairs');
-
-    // If there is no data, show a placeholder
-    if (repairs.isEmpty) {
-      return Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                localizations.repairStatus,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: isSmallScreen ? 16 : 24),
-              SizedBox(
-                height: isSmallScreen ? 180 : 220,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.pie_chart_outline,
-                        size: 48,
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        localizations.noRepairDataAvailable,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+    return ResponsiveContainer(
+      child: AnimatedResponsiveCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.repairStatus,
+            ResponsiveText(
+              text: 'Repair Status',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: isSmallScreen ? 16 : 24),
-            isSmallScreen
-                ? Column(
-                    children: [
-                      SizedBox(
-                        height: 180,
-                        child: PieChart(
-                          PieChartData(
-                            sectionsSpace: 2,
-                            centerSpaceRadius: 40,
-                            sections: [
-                              PieChartSectionData(
-                                value: paidRepairs.toDouble() == 0
-                                    ? 0.01
-                                    : paidRepairs.toDouble(),
-                                title: '',
-                                color: Colors.green.shade400,
-                                radius: 60,
-                                titleStyle: TextStyle(fontSize: 0),
-                              ),
-                              PieChartSectionData(
-                                value: unpaidRepairs.toDouble() == 0
-                                    ? 0.01
-                                    : unpaidRepairs.toDouble(),
-                                title: '',
-                                color: Colors.red.shade400,
-                                radius: 55,
-                                titleStyle: TextStyle(fontSize: 0),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildStatusLegendItem(
-                            localizations.paidRepairs,
-                            paidRepairs.toString(),
-                            '${paidPercentage.toStringAsFixed(1)}%',
-                            Colors.green.shade400,
-                            theme,
-                          ),
-                          _buildStatusLegendItem(
-                            localizations.unpaidRepairs,
-                            unpaidRepairs.toString(),
-                            '${unpaidPercentage.toStringAsFixed(1)}%',
-                            Colors.red.shade400,
-                            theme,
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: PieChart(
-                            PieChartData(
-                              sectionsSpace: 2,
-                              centerSpaceRadius: 40,
-                              sections: [
-                                PieChartSectionData(
-                                  value: paidRepairs.toDouble() == 0
-                                      ? 0.01
-                                      : paidRepairs.toDouble(),
-                                  title: '',
-                                  color: Colors.green.shade400,
-                                  radius: 60,
-                                  titleStyle: TextStyle(fontSize: 0),
-                                ),
-                                PieChartSectionData(
-                                  value: unpaidRepairs.toDouble() == 0
-                                      ? 0.01
-                                      : unpaidRepairs.toDouble(),
-                                  title: '',
-                                  color: Colors.red.shade400,
-                                  radius: 55,
-                                  titleStyle: TextStyle(fontSize: 0),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildStatusLegendItem(
-                                localizations.paidRepairs,
-                                paidRepairs.toString(),
-                                '${paidPercentage.toStringAsFixed(1)}%',
-                                Colors.green.shade400,
-                                theme,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildStatusLegendItem(
-                                localizations.unpaidRepairs,
-                                unpaidRepairs.toString(),
-                                '${unpaidPercentage.toStringAsFixed(1)}%',
-                                Colors.red.shade400,
-                                theme,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            ResponsiveSpacing(),
+            SizedBox(
+              height: isSmallScreen ? 180 : 220,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 40,
+                  sections: [
+                    PieChartSectionData(
+                      value: 40,
+                      title: '',
+                      color: Colors.green.shade400,
+                      radius: 60,
+                      titleStyle: TextStyle(fontSize: 0),
+                    ),
+                    PieChartSectionData(
+                      value: 60,
+                      title: '',
+                      color: Colors.red.shade400,
+                      radius: 55,
+                      titleStyle: TextStyle(fontSize: 0),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ResponsiveSpacing(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatusLegendItem(
+                  'Paid Repairs',
+                  '40',
+                  '40%',
+                  Colors.green.shade400,
+                  theme,
+                ),
+                _buildStatusLegendItem(
+                  'Unpaid Repairs',
+                  '60',
+                  '60%',
+                  Colors.red.shade400,
+                  theme,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -1131,28 +912,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color, ThemeData theme) {
-    return Row(
-      children: [
-        Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          margin: const EdgeInsets.only(right: 8),
-        ),
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface,
           ),
         ),
       ],

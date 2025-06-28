@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:phone_store_mangment/l10n/app_localizations.dart';
 
-import '../../models/repair_transaction.dart';
 import '../../models/repair_part.dart';
+import '../../models/repair_transaction.dart';
 import '../../services/repair_service.dart';
-import '../../widgets/parts_bottom_sheet.dart';
 
 class AddRepairScreen extends StatefulWidget {
   const AddRepairScreen({super.key});
@@ -27,7 +26,6 @@ class _AddRepairScreenState extends State<AddRepairScreen> {
   final _partNameController = TextEditingController();
   final _partCostController = TextEditingController();
   final _partPriceController = TextEditingController();
-  bool _isCostPaid = false;
 
   // Getter for localizations to avoid null checks everywhere
   AppLocalizations get localizations => _localizations!;
@@ -421,7 +419,7 @@ class _AddRepairScreenState extends State<AddRepairScreen> {
     final isSmallScreen = screenSize.width < 600;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
           localizations.addNewRepair,
@@ -445,6 +443,7 @@ class _AddRepairScreenState extends State<AddRepairScreen> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Client information card

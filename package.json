@@ -1,0 +1,47 @@
+{
+  "name": "mobile-store-management",
+  "version": "1.0.0",
+  "description": "A comprehensive solution for managing phone repairs, inventory, and customer data",
+  "main": "index.js",
+  "scripts": {
+    "start": "flutter run -d web-server --web-port 3000",
+    "dev": "flutter run -d web-server --web-port 3000 --debug",
+    "build": "flutter build web --release",
+    "build:debug": "flutter build web --debug",
+    "analyze": "flutter analyze",
+    "test": "flutter test",
+    "clean": "flutter clean",
+    "get": "flutter pub get",
+    "upgrade": "flutter pub upgrade",
+    "doctor": "flutter doctor",
+    "web:serve": "cd build/web && python3 -m http.server 8000",
+    "web:serve:python2": "cd build/web && python -m SimpleHTTPServer 8000",
+    "deploy:firebase": "flutter build web --release && firebase deploy",
+    "deploy:github": "flutter build web --release --base-href \"/mobile-store-mangment/\""
+  },
+  "keywords": [
+    "flutter",
+    "web",
+    "mobile",
+    "store",
+    "management",
+    "firebase",
+    "pwa"
+  ],
+  "author": "Mobile Store Management Team",
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/mobile-store-mangment.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/mobile-store-mangment/issues"
+  },
+  "homepage": "https://github.com/your-username/mobile-store-mangment#readme"
+} 

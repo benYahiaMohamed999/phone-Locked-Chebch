@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/repair_part.dart';
+
 import '../l10n/app_localizations.dart';
+import '../models/repair_part.dart';
 import '../services/repair_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PartsBottomSheet extends StatefulWidget {
   final List<RepairPart> parts;
@@ -173,7 +173,7 @@ class _PartsBottomSheetState extends State<PartsBottomSheet> {
               child: Form(
                 key: formKey,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Handle and title
@@ -451,10 +451,10 @@ class _PartsBottomSheetState extends State<PartsBottomSheet> {
     final localizations = AppLocalizations.of(context)!;
     final mediaQuery = MediaQuery.of(context);
 
-    return Container(
+    return SizedBox(
       width: mediaQuery.size.width,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Container(
             width: 40,
