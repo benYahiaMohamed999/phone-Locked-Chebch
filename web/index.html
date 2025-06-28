@@ -34,6 +34,10 @@
   <title>Mobile Store Management</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- Preload critical resources -->
+  <link rel="preload" href="flutter.js" as="script">
+  <link rel="preload" href="main.dart.js" as="script">
+
   <style>
     body {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -41,6 +45,7 @@
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       overflow: hidden;
+      height: 100vh;
     }
 
     .loading {
@@ -49,22 +54,36 @@
       align-items: center;
       height: 100vh;
       flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
     .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
       border-top-color: #fff;
       animation: spin 1s ease-in-out infinite;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .loading-text {
       color: white;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 500;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .loading-subtext {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
       text-align: center;
     }
 
@@ -77,31 +96,50 @@
       color: white;
       text-align: center;
       padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
     .error h1 {
-      margin-bottom: 10px;
-      font-size: 24px;
+      margin-bottom: 16px;
+      font-size: 28px;
+      font-weight: 600;
     }
 
     .error p {
-      margin-bottom: 20px;
-      opacity: 0.8;
+      margin-bottom: 24px;
+      opacity: 0.9;
+      font-size: 16px;
+      max-width: 400px;
+      line-height: 1.5;
     }
 
     .error button {
       background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
+      padding: 12px 24px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
-      transition: background 0.3s;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
     }
 
     .error button:hover {
       background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .error button:active {
+      transform: translateY(0);
     }
 
     @keyframes spin {
@@ -110,14 +148,61 @@
       }
     }
 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading,
+    .error {
+      animation: fadeIn 0.5s ease-out;
+    }
+
     #flutter_target {
       width: 100%;
       height: 100vh;
+      position: relative;
+    }
+
+    /* Hide loading when Flutter is ready */
+    .flutter-ready .loading {
+      display: none;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border-width: 3px;
+      }
+
+      .loading-text {
+        font-size: 18px;
+      }
+
+      .loading-subtext {
+        font-size: 13px;
+      }
+
+      .error h1 {
+        font-size: 24px;
+      }
+
+      .error p {
+        font-size: 14px;
+      }
     }
   </style>
 
   <!-- Firebase SDK -->
-  <!-- Using the newer Firebase Web SDK version 10 with CDN -->
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
@@ -159,7 +244,8 @@
   <!-- Loading screen -->
   <div id="loading" class="loading">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Loading Mobile Store Management...</div>
+    <div class="loading-text">Loading Mobile Store Management</div>
+    <div class="loading-subtext">Please wait while we prepare your application...</div>
   </div>
 
   <!-- Error screen -->
@@ -175,38 +261,95 @@
   <script src="flutter.js" defer></script>
 
   <script>
-    // Modern Flutter web initialization
+    // Modern Flutter web initialization with improved error handling
     window.addEventListener('load', function (ev) {
+      // Check if Flutter is available
+      if (typeof _flutter === 'undefined') {
+        console.error('Flutter.js not loaded');
+        showError('Flutter runtime not available');
+        return;
+      }
+
+      // Update loading text periodically
+      const loadingText = document.querySelector('.loading-text');
+      const loadingMessages = [
+        'Loading Mobile Store Management',
+        'Initializing application...',
+        'Setting up Firebase...',
+        'Preparing dashboard...',
+        'Almost ready...'
+      ];
+      let messageIndex = 0;
+      const messageInterval = setInterval(() => {
+        messageIndex = (messageIndex + 1) % loadingMessages.length;
+        loadingText.textContent = loadingMessages[messageIndex];
+      }, 2000);
+
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         onEntrypointLoaded: function (engineInitializer) {
+          clearInterval(messageInterval);
+          loadingText.textContent = 'Starting application...';
+
           engineInitializer.initializeEngine().then(function (appRunner) {
             appRunner.runApp();
             // Hide loading screen when Flutter is ready
-            document.getElementById('loading').style.display = 'none';
+            document.body.classList.add('flutter-ready');
+            console.log('Flutter app started successfully');
           }).catch(function (error) {
+            clearInterval(messageInterval);
             console.error('Failed to initialize Flutter engine:', error);
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'flex';
+            showError('Failed to start application: ' + error.message);
           });
+        },
+        onEntrypointLoadError: function (error) {
+          clearInterval(messageInterval);
+          console.error('Failed to load Flutter entrypoint:', error);
+          showError('Failed to load application files');
         }
       });
 
-      // Fallback: Hide loading after 10 seconds if Flutter hasn't loaded
+      // Fallback: Hide loading after 15 seconds if Flutter hasn't loaded
       setTimeout(function () {
         const loading = document.getElementById('loading');
-        if (loading.style.display !== 'none') {
-          loading.style.display = 'none';
-          document.getElementById('error').style.display = 'flex';
+        if (loading.style.display !== 'none' && !document.body.classList.contains('flutter-ready')) {
+          clearInterval(messageInterval);
+          showError('Application took too long to load. Please refresh the page.');
         }
-      }, 10000);
+      }, 15000);
     });
 
-    // Handle Flutter errors (keeping for compatibility)
-    window.addEventListener('flutter-error', function () {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').style.display = 'flex';
+    // Handle Flutter errors
+    window.addEventListener('flutter-error', function (event) {
+      console.error('Flutter error:', event.detail);
+      showError('Application error occurred');
     });
+
+    // Handle Flutter first frame
+    window.addEventListener('flutter-first-frame', function () {
+      console.log('Flutter first frame rendered');
+    });
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      const errorDiv = document.getElementById('error');
+      const errorText = errorDiv.querySelector('p');
+      errorText.textContent = message;
+      errorDiv.style.display = 'flex';
+    }
+
+    // Handle service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js')
+          .then(function (registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function (err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
   </script>
 </body>
 

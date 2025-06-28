@@ -8,8 +8,17 @@
     "description": "A comprehensive solution for managing phone repairs, inventory, and customer data.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
-    "categories": ["business", "productivity", "utilities"],
+    "categories": [
+        "business",
+        "productivity",
+        "utilities"
+    ],
     "lang": "en",
+    "scope": "/",
+    "display_override": [
+        "standalone",
+        "minimal-ui"
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",
@@ -34,6 +43,41 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Add Repair",
+            "short_name": "Add Repair",
+            "description": "Add a new repair transaction",
+            "url": "/?action=add_repair",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "View dashboard",
+            "url": "/?action=dashboard",
+            "icons": [
+                {
+                    "src": "icons/Icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Mobile Store Management Dashboard"
         }
     ]
 }
