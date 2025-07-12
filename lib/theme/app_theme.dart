@@ -38,9 +38,8 @@ class AppTheme {
         tertiaryContainer: Color(0xFFFEF3C7),
         error: errorColor,
         errorContainer: Color(0xFFFEE2E2),
-        background: lightBackground,
         surface: lightSurface,
-        surfaceVariant: Color(0xFFF3F4F6),
+        surfaceContainerHighest: Color(0xFFF3F4F6),
         onPrimary: Colors.white,
         onPrimaryContainer: Color(0xFF312E81),
         onSecondary: Colors.white,
@@ -49,7 +48,6 @@ class AppTheme {
         onTertiaryContainer: Color(0xFF92400E),
         onError: Colors.white,
         onErrorContainer: Color(0xFF7F1D1D),
-        onBackground: lightOnSurface,
         onSurface: lightOnSurface,
         onSurfaceVariant: lightOnSurfaceVariant,
         outline: Color(0xFFD1D5DB),
@@ -165,7 +163,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -250,13 +248,14 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: errorColor, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         hintStyle: const TextStyle(
           color: Color(0xFF9CA3AF),
           fontSize: 16,
         ),
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: primaryColor,
         unselectedLabelColor: Color(0xFF6B7280),
         indicatorSize: TabBarIndicatorSize.tab,
@@ -266,8 +265,8 @@ class AppTheme {
         backgroundColor: lightSurface,
         elevation: 2,
         indicatorColor: primaryColor.withOpacity(0.1),
-        labelTextStyle: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -280,8 +279,8 @@ class AppTheme {
             color: Color(0xFF6B7280),
           );
         }),
-        iconTheme: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return const IconThemeData(color: primaryColor, size: 24);
           }
           return const IconThemeData(color: Color(0xFF6B7280), size: 24);
@@ -354,9 +353,8 @@ class AppTheme {
         tertiaryContainer: Color(0xFF92400E),
         error: Color(0xFFF87171),
         errorContainer: Color(0xFF7F1D1D),
-        background: darkBackground,
         surface: darkSurface,
-        surfaceVariant: Color(0xFF334155),
+        surfaceContainerHighest: Color(0xFF334155),
         onPrimary: Color(0xFF0F172A),
         onPrimaryContainer: Color(0xFFE0E7FF),
         onSecondary: Color(0xFF0F172A),
@@ -365,7 +363,6 @@ class AppTheme {
         onTertiaryContainer: Color(0xFFFEF3C7),
         onError: Color(0xFF0F172A),
         onErrorContainer: Color(0xFFFEE2E2),
-        onBackground: darkOnSurface,
         onSurface: darkOnSurface,
         onSurfaceVariant: darkOnSurfaceVariant,
         outline: Color(0xFF475569),
@@ -376,7 +373,8 @@ class AppTheme {
         inversePrimary: Color(0xFF4F46E5),
         surfaceTint: primaryLightColor,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
+      textTheme:
+          GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
         displayLarge: GoogleFonts.inter(
           fontSize: 57,
           fontWeight: FontWeight.w400,
@@ -481,7 +479,7 @@ class AppTheme {
         foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -566,13 +564,14 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFFF87171), width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         hintStyle: const TextStyle(
           color: Color(0xFF94A3B8),
           fontSize: 16,
         ),
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: primaryLightColor,
         unselectedLabelColor: Color(0xFF94A3B8),
         indicatorSize: TabBarIndicatorSize.tab,
@@ -582,8 +581,8 @@ class AppTheme {
         backgroundColor: darkSurface,
         elevation: 2,
         indicatorColor: primaryLightColor.withOpacity(0.1),
-        labelTextStyle: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -596,8 +595,8 @@ class AppTheme {
             color: Color(0xFF94A3B8),
           );
         }),
-        iconTheme: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return const IconThemeData(color: primaryLightColor, size: 24);
           }
           return const IconThemeData(color: Color(0xFF94A3B8), size: 24);
