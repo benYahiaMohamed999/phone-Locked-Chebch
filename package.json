@@ -6,7 +6,8 @@
   "scripts": {
     "start": "flutter run -d web-server --web-port 3000",
     "dev": "flutter run -d web-server --web-port 3000 --debug",
-    "build": "flutter build web --release",
+    "build": "chmod +x build.sh && ./build.sh",
+    "build:netlify": "chmod +x build-netlify.sh && ./build-netlify.sh",
     "build:debug": "flutter build web --debug",
     "analyze": "flutter analyze",
     "test": "flutter test",
@@ -17,6 +18,7 @@
     "web:serve": "cd build/web && python3 -m http.server 8000",
     "web:serve:python2": "cd build/web && python -m SimpleHTTPServer 8000",
     "deploy:firebase": "flutter build web --release && firebase deploy",
+    "deploy:netlify": "npm run build:netlify",
     "deploy:github": "flutter build web --release --base-href \"/mobile-store-mangment/\""
   },
   "keywords": [
@@ -44,4 +46,4 @@
     "url": "https://github.com/your-username/mobile-store-mangment/issues"
   },
   "homepage": "https://github.com/your-username/mobile-store-mangment#readme"
-} 
+}
