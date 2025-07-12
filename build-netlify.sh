@@ -6,7 +6,7 @@ set -e
 echo "🚀 Starting Flutter web build for Netlify..."
 
 # Check if we're in a Netlify environment
-if [ -n "$NETLIFY" ]; then
+if [ -n "$NETLIFY" ] || [ -n "$CI" ]; then
     echo "📦 Netlify environment detected, installing Flutter..."
     
     # Install Flutter
@@ -24,6 +24,10 @@ fi
 # Get Flutter dependencies
 echo "📚 Getting Flutter dependencies..."
 flutter pub get
+
+# Clean previous build
+echo "🧹 Cleaning previous build..."
+flutter clean
 
 # Build the web app
 echo "🔨 Building web app..."

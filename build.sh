@@ -3,11 +3,11 @@
 # Exit on any error
 set -e
 
-echo "🚀 Starting Flutter web build for Vercel..."
+echo "🚀 Starting Flutter web build..."
 
-# Check if we're in a Vercel environment
-if [ -n "$VERCEL" ]; then
-    echo "📦 Vercel environment detected, installing Flutter..."
+# Check if we're in a deployment environment
+if [ -n "$VERCEL" ] || [ -n "$NETLIFY" ] || [ -n "$CI" ]; then
+    echo "📦 Deployment environment detected, installing Flutter..."
     
     # Install Flutter
     git clone https://github.com/flutter/flutter.git -b stable --depth 1
@@ -25,11 +25,15 @@ fi
 echo "📚 Getting Flutter dependencies..."
 flutter pub get
 
+# Clean previous build
+echo "🧹 Cleaning previous build..."
+flutter clean
+
 # Build the web app
 echo "🔨 Building web app..."
 flutter build web --release
 
 echo "✅ Build completed successfully!"
-echo "📁 Output directory: build/web" 
+echo "📁 Output directory: build/web"
 
 git add build/web/
