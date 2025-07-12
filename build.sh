@@ -36,4 +36,11 @@ flutter build web --release
 echo "✅ Build completed successfully!"
 echo "📁 Output directory: build/web"
 
-git add build/web/
+# Check if build was successful
+if [ -d "build/web" ] && [ -f "build/web/index.html" ]; then
+    echo "✅ Build verification passed"
+    exit 0
+else
+    echo "❌ Build verification failed"
+    exit 1
+fi
