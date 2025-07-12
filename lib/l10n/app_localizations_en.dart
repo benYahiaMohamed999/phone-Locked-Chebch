@@ -66,7 +66,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmDelete => 'Delete Repair';
 
   @override
-  String get deleteRepairConfirmation => 'Are you sure you want to delete this repair? This action cannot be undone.';
+  String get deleteRepairConfirmation =>
+      'Are you sure you want to delete this repair? This action cannot be undone.';
 
   @override
   String get cancel => 'Cancel';
@@ -102,7 +103,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get repairDetailsRequired => 'Please enter repair details';
 
   @override
-  String get totalSellingPriceRequired => 'Please enter the total selling price';
+  String get totalSellingPriceRequired =>
+      'Please enter the total selling price';
 
   @override
   String get invalidPrice => 'Please enter a valid price';
@@ -207,7 +209,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark Mode';
 
   @override
-  String get darkModeDescription => 'Enable dark mode for better visibility in low-light conditions';
+  String get darkModeDescription =>
+      'Enable dark mode for better visibility in low-light conditions';
 
   @override
   String get language => 'Language';
@@ -315,7 +318,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markAllAsPaid => 'Mark All Paid';
 
   @override
-  String get confirmMarkAllPaid => 'Are you sure you want to mark all parts as paid?';
+  String get confirmMarkAllPaid =>
+      'Are you sure you want to mark all parts as paid?';
 
   @override
   String partDeleted(Object partName) {
@@ -348,13 +352,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingData => 'Error loading data';
 
   @override
-  String get noRepairsForSelectedPeriod => 'No repairs found for selected period';
+  String get noRepairsForSelectedPeriod =>
+      'No repairs found for selected period';
 
   @override
-  String get noProfitDataAvailable => 'No profit data available for the selected period';
+  String get noProfitDataAvailable =>
+      'No profit data available for the selected period';
 
   @override
-  String get noRepairDataAvailable => 'No repair data available for the selected period';
+  String get noRepairDataAvailable =>
+      'No repair data available for the selected period';
 
   @override
   String get repairStatus => 'Repair Status';

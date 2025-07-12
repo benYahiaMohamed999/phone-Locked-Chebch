@@ -66,7 +66,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmDelete => 'حذف الإصلاح';
 
   @override
-  String get deleteRepairConfirmation => 'هل أنت متأكد من حذف هذا الإصلاح؟ لا يمكن التراجع عن هذا الإجراء.';
+  String get deleteRepairConfirmation =>
+      'هل أنت متأكد من حذف هذا الإصلاح؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
   String get cancel => 'إلغاء';
@@ -207,7 +208,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get darkMode => 'الوضع الليلي';
 
   @override
-  String get darkModeDescription => 'تفعيل الوضع الليلي لتحسين الرؤية في الظروف منخفضة الإضاءة';
+  String get darkModeDescription =>
+      'تفعيل الوضع الليلي لتحسين الرؤية في الظروف منخفضة الإضاءة';
 
   @override
   String get language => 'اللغة';
@@ -309,13 +311,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clientInfo => 'معلومات العميل';
 
   @override
-  String get searchByClientPhoneModel => 'بحث حسب العميل أو الهاتف أو الموديل...';
+  String get searchByClientPhoneModel =>
+      'بحث حسب العميل أو الهاتف أو الموديل...';
 
   @override
   String get markAllAsPaid => 'تعليم الكل كمدفوع';
 
   @override
-  String get confirmMarkAllPaid => 'هل أنت متأكد أنك تريد تعليم جميع القطع كمدفوعة؟';
+  String get confirmMarkAllPaid =>
+      'هل أنت متأكد أنك تريد تعليم جميع القطع كمدفوعة؟';
 
   @override
   String partDeleted(Object partName) {
@@ -348,7 +352,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorLoadingData => 'خطأ في تحميل البيانات';
 
   @override
-  String get noRepairsForSelectedPeriod => 'لم يتم العثور على إصلاحات للفترة المحددة';
+  String get noRepairsForSelectedPeriod =>
+      'لم يتم العثور على إصلاحات للفترة المحددة';
 
   @override
   String get noProfitDataAvailable => 'لا تتوفر بيانات ربح للفترة المحددة';

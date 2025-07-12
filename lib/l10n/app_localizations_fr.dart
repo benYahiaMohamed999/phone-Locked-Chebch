@@ -66,7 +66,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirmDelete => 'Supprimer la réparation';
 
   @override
-  String get deleteRepairConfirmation => 'Êtes-vous sûr de vouloir supprimer cette réparation ? Cette action ne peut pas être annulée.';
+  String get deleteRepairConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer cette réparation ? Cette action ne peut pas être annulée.';
 
   @override
   String get cancel => 'Annuler';
@@ -78,13 +79,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get repairMarkedAsPaid => 'Réparation marquée comme payée avec succès';
 
   @override
-  String get errorMarkingAsPaid => 'Erreur lors du marquage de la réparation comme payée';
+  String get errorMarkingAsPaid =>
+      'Erreur lors du marquage de la réparation comme payée';
 
   @override
   String get repairDeleted => 'Réparation supprimée avec succès';
 
   @override
-  String get errorDeletingRepair => 'Erreur lors de la suppression de la réparation';
+  String get errorDeletingRepair =>
+      'Erreur lors de la suppression de la réparation';
 
   @override
   String get addRepair => 'Ajouter une Réparation';
@@ -99,10 +102,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get repairDetails => 'Probleme d\'appareil';
 
   @override
-  String get repairDetailsRequired => 'Veuillez entrer les détails de la réparation';
+  String get repairDetailsRequired =>
+      'Veuillez entrer les détails de la réparation';
 
   @override
-  String get totalSellingPriceRequired => 'Veuillez entrer le prix de vente total';
+  String get totalSellingPriceRequired =>
+      'Veuillez entrer le prix de vente total';
 
   @override
   String get invalidPrice => 'Veuillez entrer un prix valide';
@@ -138,7 +143,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get analytics => 'Analytiques';
 
   @override
-  String get noRepairsFound => 'Aucune réparation trouvée pour la période sélectionnée';
+  String get noRepairsFound =>
+      'Aucune réparation trouvée pour la période sélectionnée';
 
   @override
   String get totalRepairs => 'Total des Réparations';
@@ -207,7 +213,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get darkMode => 'Mode Sombre';
 
   @override
-  String get darkModeDescription => 'Activer le mode sombre pour une meilleure visibilité en conditions de faible éclairage';
+  String get darkModeDescription =>
+      'Activer le mode sombre pour une meilleure visibilité en conditions de faible éclairage';
 
   @override
   String get language => 'Langue';
@@ -228,7 +235,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get logout => 'Déconnexion';
 
   @override
-  String get logoutConfirmation => 'Êtes-vous sûr de vouloir vous déconnecter ?';
+  String get logoutConfirmation =>
+      'Êtes-vous sûr de vouloir vous déconnecter ?';
 
   @override
   String get costPaid => 'Fournisseur payé';
@@ -291,7 +299,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addNewRepair => 'Ajouter une nouvelle réparation';
 
   @override
-  String get addAtLeastOnePart => 'Veuillez ajouter au moins une pièce de réparation';
+  String get addAtLeastOnePart =>
+      'Veuillez ajouter au moins une pièce de réparation';
 
   @override
   String get clientName => 'Nom du Client';
@@ -309,13 +318,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clientInfo => 'Informations du Client';
 
   @override
-  String get searchByClientPhoneModel => 'Rechercher par client, téléphone ou modèle...';
+  String get searchByClientPhoneModel =>
+      'Rechercher par client, téléphone ou modèle...';
 
   @override
   String get markAllAsPaid => 'Marquer Tout Comme Payé';
 
   @override
-  String get confirmMarkAllPaid => 'Êtes-vous sûr de vouloir marquer toutes les pièces comme payées?';
+  String get confirmMarkAllPaid =>
+      'Êtes-vous sûr de vouloir marquer toutes les pièces comme payées?';
 
   @override
   String partDeleted(Object partName) {
@@ -348,13 +359,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorLoadingData => 'Erreur lors du chargement des données';
 
   @override
-  String get noRepairsForSelectedPeriod => 'Aucune réparation trouvée pour la période sélectionnée';
+  String get noRepairsForSelectedPeriod =>
+      'Aucune réparation trouvée pour la période sélectionnée';
 
   @override
-  String get noProfitDataAvailable => 'Aucune donnée de bénéfice disponible pour la période sélectionnée';
+  String get noProfitDataAvailable =>
+      'Aucune donnée de bénéfice disponible pour la période sélectionnée';
 
   @override
-  String get noRepairDataAvailable => 'Aucune donnée de réparation disponible pour la période sélectionnée';
+  String get noRepairDataAvailable =>
+      'Aucune donnée de réparation disponible pour la période sélectionnée';
 
   @override
   String get repairStatus => 'Statut des Réparations';

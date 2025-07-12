@@ -147,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   foregroundColor: theme.colorScheme.primary,
                 ),
               ),
-              dialogTheme: DialogTheme(
+              dialogTheme: DialogThemeData(
                 backgroundColor: theme.colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

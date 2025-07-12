@@ -2,16 +2,17 @@
 
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../../services/repair_service.dart';
-import '../../models/repair_transaction.dart';
+
 import '../../l10n/app_localizations.dart';
-import '../../widgets/responsive_layout.dart';
+import '../../models/repair_transaction.dart';
+import '../../services/repair_service.dart';
 import '../../widgets/animated_responsive_card.dart';
+import '../../widgets/responsive_layout.dart';
 
 class AnalyticsData {
   final int totalRepairs;
@@ -114,7 +115,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 foregroundColor: theme.colorScheme.primary,
               ),
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               backgroundColor: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -157,9 +158,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               rangeSelectionBackgroundColor:
-              // ignore: deprecated_member_use
-                  theme.colorScheme.primary.withOpacity(0.2),
                   // ignore: deprecated_member_use
+                  theme.colorScheme.primary.withOpacity(0.2),
+              // ignore: deprecated_member_use
               rangeSelectionOverlayColor: MaterialStateProperty.all(
                 // ignore: deprecated_member_use
                 theme.colorScheme.primary.withOpacity(0.2),
@@ -201,8 +202,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           59,
         );
 
-        log(
-            'Debug: Custom date range set - Start: $_startDate, End: $_endDate');
+        log('Debug: Custom date range set - Start: $_startDate, End: $_endDate');
       });
     }
   }
@@ -225,7 +225,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildMobileLayout() {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -260,7 +260,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildTabletLayout() {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -296,7 +296,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildDesktopLayout() {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: ResponsivePadding(
@@ -312,11 +312,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   color: theme.colorScheme.onSurface,
                 ),
               ),
-              ResponsiveSpacing(),
+              const ResponsiveSpacing(),
               _buildDateRangeSelector(),
-              ResponsiveSpacing(),
+              const ResponsiveSpacing(),
               _buildStatsCards(),
-              ResponsiveSpacing(),
+              const ResponsiveSpacing(),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -324,7 +324,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     flex: 2,
                     child: _buildRevenueChart(),
                   ),
-                  ResponsiveSpacing(isVertical: false),
+                  const ResponsiveSpacing(isVertical: false),
                   Expanded(
                     flex: 1,
                     child: _buildRepairsChart(),
@@ -341,7 +341,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Widget _buildLargeDesktopLayout() {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: ResponsivePadding(
@@ -357,11 +357,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   color: theme.colorScheme.onSurface,
                 ),
               ),
-              ResponsiveSpacing(desktopSpacing: 32),
+              const ResponsiveSpacing(desktopSpacing: 32),
               _buildDateRangeSelector(),
-              ResponsiveSpacing(desktopSpacing: 40),
+              const ResponsiveSpacing(desktopSpacing: 40),
               _buildStatsCards(),
-              ResponsiveSpacing(desktopSpacing: 40),
+              const ResponsiveSpacing(desktopSpacing: 40),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -369,7 +369,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     flex: 2,
                     child: _buildRevenueChart(),
                   ),
-                  ResponsiveSpacing(desktopSpacing: 32, isVertical: false),
+                  const ResponsiveSpacing(
+                      desktopSpacing: 32, isVertical: false),
                   Expanded(
                     flex: 1,
                     child: _buildRepairsChart(),
@@ -432,6 +433,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           Icons.calendar_month,
                           color: _selectedTimeRange == 0
                               ? theme.colorScheme.primary
+                              // ignore: deprecated_member_use
                               : theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         onPressed: _selectDateRange,
@@ -451,6 +453,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           Icons.calendar_month,
                           color: _selectedTimeRange == 0
                               ? theme.colorScheme.primary
+                              // ignore: deprecated_member_use
                               : theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                         onPressed: _selectDateRange,
@@ -474,6 +477,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
+              // ignore: deprecated_member_use
               ? theme.colorScheme.primary.withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -534,8 +538,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         final repairs = snapshot.data!;
         final paidRepairs = repairs.where((r) => r.isPaid).toList();
         final totalRepairs = repairs.length;
-        final totalRevenue = paidRepairs.fold(0.0, (sum, item) => sum + item.totalSellingPrice);
-        final totalProfit = paidRepairs.fold(0.0, (sum, item) => sum + item.totalProfit);
+        final totalRevenue =
+            paidRepairs.fold(0.0, (sum, item) => sum + item.totalSellingPrice);
+        final totalProfit =
+            paidRepairs.fold(0.0, (sum, item) => sum + item.totalProfit);
 
         return ResponsiveGrid(
           mobileColumns: 1,
@@ -640,7 +646,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                     ],
                   ),
-                  ResponsiveSpacing(),
+                  const ResponsiveSpacing(),
                   ResponsiveText(
                     text: value,
                     style: theme.textTheme.titleLarge?.copyWith(
@@ -674,7 +680,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
               ],
             ),
-            ResponsiveSpacing(),
+            const ResponsiveSpacing(),
             SizedBox(
               height: isSmallScreen ? 220 : 300,
               child: LineChart(
@@ -721,8 +727,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           return Text(
                             '${value.toInt()}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.7),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
                               fontSize: isSmallScreen ? 8 : 10,
                             ),
                           );
@@ -738,18 +744,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           return Text(
                             '\$${value.toInt()}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.7),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
                               fontSize: isSmallScreen ? 8 : 10,
                             ),
                           );
                         },
                       ),
                     ),
-                    topTitles: AxisTitles(
+                    topTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
                     ),
-                    rightTitles: AxisTitles(
+                    rightTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
                     ),
                   ),
@@ -757,13 +763,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   lineBarsData: [
                     LineChartBarData(
                       spots: [
-                        FlSpot(0, 50),
-                        FlSpot(1, 70),
-                        FlSpot(2, 60),
-                        FlSpot(3, 80),
-                        FlSpot(4, 75),
-                        FlSpot(5, 90),
-                        FlSpot(6, 85),
+                        const FlSpot(0, 50),
+                        const FlSpot(1, 70),
+                        const FlSpot(2, 60),
+                        const FlSpot(3, 80),
+                        const FlSpot(4, 75),
+                        const FlSpot(5, 90),
+                        const FlSpot(6, 85),
                       ],
                       isCurved: true,
                       gradient: LinearGradient(
@@ -774,7 +780,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                       barWidth: 5,
                       isStrokeCapRound: true,
-                      dotData: FlDotData(
+                      dotData: const FlDotData(
                         show: false,
                       ),
                       belowBarData: BarAreaData(
@@ -814,7 +820,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            ResponsiveSpacing(),
+            const ResponsiveSpacing(),
             SizedBox(
               height: isSmallScreen ? 180 : 220,
               child: PieChart(
@@ -827,20 +833,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       title: '',
                       color: Colors.green.shade400,
                       radius: 60,
-                      titleStyle: TextStyle(fontSize: 0),
+                      titleStyle: const TextStyle(fontSize: 0),
                     ),
                     PieChartSectionData(
                       value: 60,
                       title: '',
                       color: Colors.red.shade400,
                       radius: 55,
-                      titleStyle: TextStyle(fontSize: 0),
+                      titleStyle: const TextStyle(fontSize: 0),
                     ),
                   ],
                 ),
               ),
             ),
-            ResponsiveSpacing(),
+            const ResponsiveSpacing(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
